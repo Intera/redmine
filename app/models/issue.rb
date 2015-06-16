@@ -257,6 +257,17 @@ class Issue < ActiveRecord::Base
     self.status_id
   end
 
+  # Returns the current status if the workflow allows the status to be unchanged
+  # or the first status from the list of allowed new statuses.
+  def status_id_or_first_allowed
+    user = User.current
+    if new_statuses_allowed_to(user).collect(&:id).include?(status_id.to_i)
+      status_id
+    else
+      new_statuses_allowed_to(user).first(&:id).id
+    end
+  end
+
   # Sets the status.
   def status=(status)
     if status != self.status
@@ -643,6 +654,10 @@ class Issue < ActiveRecord::Base
         end
       end
     end
+
+    unless new_statuses_allowed_to(User.current).collect(&:id).include?(status_id.to_i)
+      errors.add :status_id
+    end
   end
 
   # Validates the issue against additional workflow requirements
@@ -837,7 +852,7 @@ class Issue < ActiveRecord::Base
           assignee_transitions_allowed
           )
       end
-      statuses << initial_status unless statuses.empty?
+      statuses << initial_status if statuses.empty?
       statuses << default_status if include_default
       statuses = statuses.compact.uniq.sort
       if blocked?
