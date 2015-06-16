@@ -484,6 +484,10 @@ class Issue < ActiveRecord::Base
       attrs['custom_fields'].select! {|c| editable_custom_field_ids.include?(c['id'].to_s)}
     end
 
+    if (c_id = attrs.delete('category_id')) && safe_attribute?('category_id')
+      self.category_id = c_id if project && project.issue_category_ids.include?(c_id.to_i)
+    end
+
     # mass-assignment security bypass
     assign_attributes attrs, :without_protection => true
   end
