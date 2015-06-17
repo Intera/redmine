@@ -37,6 +37,7 @@ namespace :redmine do
     options[:tracker] = ENV['tracker'].to_i if ENV['tracker']
     options[:users] = (ENV['users'] || '').split(',').each(&:strip!)
     options[:version] = ENV['version'] if ENV['version'] 
+    options[:respect_working_days] = !!ENV['respect_working_days']
 
     Mailer.with_synched_deliveries do
       Mailer.reminders(options)

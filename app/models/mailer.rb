@@ -97,10 +97,11 @@ class Mailer < ActionMailer::Base
     end
   end
 
-  def reminder(user, issues, days)
+  def reminder(user, issues, days, respect_working_days)
     set_language_if_valid user.language
     @issues = issues
     @days = days
+    @respect_working_days = respect_working_days
     @issues_url = url_for(:controller => 'issues', :action => 'index',
                                 :set_filter => 1, :assigned_to_id => user.id,
                                 :sort => 'due_date:asc')
@@ -324,12 +325,16 @@ class Mailer < ActionMailer::Base
 
   # Sends reminders to issue assignees
   # Available options:
-  # * :days     => how many days in the future to remind about (defaults to 7)
-  # * :tracker  => id of tracker for filtering issues (defaults to all trackers)
-  # * :project  => id or identifier of project to process (defaults to all projects)
-  # * :users    => array of user/group ids who should be reminded
-  # * :version  => name of target version for filtering issues (defaults to none)
+  # * :days                  => how many days in the future to remind about (defaults to 7)
+  # * :tracker               => id of tracker for filtering issues (defaults to all trackers)
+  # * :project               => id or identifier of project to process (defaults to all projects)
+  # * :users                 => array of user/group ids who should be reminded
+  # * :version               => name of target version for filtering issues (defaults to none)
+  # * :respect_working_days  => if true the working days setting will be used to calculate the date difference
   def self.reminders(options={})
+
+    extend Redmine::Utils::DateCalculation
+
     days = options[:days] || 7
     project = options[:project] ? Project.find(options[:project]) : nil
     tracker = options[:tracker] ? Tracker.find(options[:tracker]) : nil
@@ -338,6 +343,12 @@ class Mailer < ActionMailer::Base
       raise ActiveRecord::RecordNotFound.new("Couldn't find Version with named #{options[:version]}")
     end
     user_ids = options[:users]
+
+    days_requested = days
+    if options[:respect_working_days]
+      working_day_count = working_days(Date.today, (days + 7).day.from_now.to_date)
+      days = days + (days + 7 - working_day_count)
+    end
 
     scope = Issue.open.where("#{Issue.table_name}.assigned_to_id IS NOT NULL" +
       " AND #{Project.table_name}.status = #{Project::STATUS_ACTIVE}" +
@@ -359,7 +370,7 @@ class Mailer < ActionMailer::Base
     end
 
     issues_by_assignee.each do |assignee, issues|
-      reminder(assignee, issues, days).deliver if assignee.is_a?(User) && assignee.active?
+      reminder(assignee, issues, days_requested, options[:respect_working_days]).deliver if assignee.is_a?(User) && assignee.active?
     end
   end
 
