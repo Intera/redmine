@@ -29,3 +29,8 @@ issue_statuses_006:
   name: Rejected
   is_closed: true
   position: 6
+issue_statuses_007:
+  id: 7
+  name: ForcedChange
+  is_closed: false
+  position: 7

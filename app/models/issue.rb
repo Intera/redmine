@@ -264,7 +264,7 @@ class Issue < ActiveRecord::Base
     if new_statuses_allowed_to(user).collect(&:id).include?(status_id.to_i)
       status_id
     else
-      new_statuses_allowed_to(user).first(&:id).id
+      new_statuses_allowed_to(user).first(&:id).try(:id)
     end
   end
 
