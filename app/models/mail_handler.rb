@@ -396,6 +396,10 @@ class MailHandler < ActionMailer::Base
       'done_ratio' => get_keyword(:done_ratio, :override => true, :format => '(\d|10)?0')
     }.delete_if {|k, v| v.blank? }
 
+    if !issue.new_record? && (!attrs.has_key?('status_id') || !issue.new_statuses_allowed_to.collect(&:id).include?(attrs['status_id'].to_i))
+      attrs['status_id'] = issue.status_id_or_first_allowed
+    end
+
     if issue.new_record? && attrs['tracker_id'].nil?
       attrs['tracker_id'] = issue.project.trackers.first.try(:id)
     end

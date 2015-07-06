@@ -764,6 +764,34 @@ class MailHandlerTest < ActiveSupport::TestCase
     assert_equal 'Normal', journal.issue.priority.name
   end
 
+  def test_update_issue_should_force_status_change
+
+    journal = submit_email('ticket_reply_forced_status_change.eml')
+
+    assert journal.is_a?(Journal)
+    assert_equal User.find_by_login('jsmith'), journal.user
+    assert_equal Issue.find(15), journal.journalized
+    assert_match /Status change/, journal.notes
+
+    issue = Issue.find(journal.issue.id)
+    assert_equal IssueStatus.find_by_name('Assigned'), issue.status
+
+  end
+
+  def test_update_issue_should_reset_invalid_status
+
+    journal = submit_email('ticket_reply_invalid_status_reset.eml')
+
+    assert journal.is_a?(Journal)
+    assert_equal User.find_by_login('jsmith'), journal.user
+    assert_equal Issue.find(15), journal.journalized
+    assert_match /Invalid status change/, journal.notes
+
+    issue = Issue.find(journal.issue.id)
+    assert_equal IssueStatus.find_by_name('Assigned'), issue.status
+
+  end
+
   def test_replying_to_a_private_note_should_add_reply_as_private
     private_journal = Journal.create!(:notes => 'Private notes', :journalized => Issue.find(1), :private_notes => true, :user_id => 2)
 
