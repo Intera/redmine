@@ -432,11 +432,18 @@ class MailHandler < ActionMailer::Base
 
     # strip html tags and remove doctype directive
     if parts.any? {|p| p.mime_type == 'text/html'}
+      @plain_text_body = remove_unused_html_elements(@plain_text_body)
       @plain_text_body = strip_tags(@plain_text_body.strip)
       @plain_text_body.sub! %r{^<!DOCTYPE .*$}, ''
     end
 
     @plain_text_body
+  end
+
+  def remove_unused_html_elements(html)
+    doc = Nokogiri::HTML::Document.parse(html)
+    doc.css('head').remove
+    doc.to_html
   end
 
   def cleaned_up_text_body

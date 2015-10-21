@@ -982,6 +982,15 @@ class MailHandlerTest < ActiveSupport::TestCase
     assert_equal false, MailHandler.safe_receive
   end
 
+  def test_outlook_conditional_comments_are_stripped_from_email_body
+    issue = submit_email(
+        'outlook_mail_with_conditional_comments.eml',
+        :issue => {:project => 'ecookbook'}
+    )
+    assert_kind_of Issue, issue
+    assert !issue.description.include?('[if !mso]')
+  end
+
   private
 
   def submit_email(filename, options={})
