@@ -997,6 +997,8 @@ en:
   label_relations: Relations
   label_new_project_issue_tab_enabled: Display the "New issue" tab
   label_new_object_tab_enabled: Display the "+" drop-down
+  label_tests: Test case of
+  label_tested: Test requirement of
 
   button_login: Login
   button_submit: Submit
