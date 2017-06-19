@@ -40,3 +40,5 @@
 /Gemfile.lock
 /Gemfile.local
 
+/vendor/bundle
+/config/unicorn.rb
