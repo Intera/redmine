@@ -45,6 +45,8 @@ class IssueRelation < ActiveRecord::Base
   TYPE_FOLLOWS      = "follows"
   TYPE_COPIED_TO    = "copied_to"
   TYPE_COPIED_FROM  = "copied_from"
+  TYPE_TESTS  = "tests"
+  TYPE_TESTED  = "tested"
 
   TYPES = {
     TYPE_RELATES =>     { :name => :label_relates_to, :sym_name => :label_relates_to,
@@ -64,7 +66,11 @@ class IssueRelation < ActiveRecord::Base
     TYPE_COPIED_TO =>   { :name => :label_copied_to, :sym_name => :label_copied_from,
                           :order => 8, :sym => TYPE_COPIED_FROM },
     TYPE_COPIED_FROM => { :name => :label_copied_from, :sym_name => :label_copied_to,
-                          :order => 9, :sym => TYPE_COPIED_TO, :reverse => TYPE_COPIED_TO }
+                          :order => 9, :sym => TYPE_COPIED_TO, :reverse => TYPE_COPIED_TO },
+    TYPE_TESTS =>   { :name => :label_tests, :sym_name => :label_tested,
+                          :order => 10, :sym => TYPE_TESTED },
+    TYPE_TESTED => { :name => :label_tested, :sym_name => :label_tests,
+                          :order => 11, :sym => TYPE_TESTS, :reverse => TYPE_TESTS }
   }.freeze
 
   validates_presence_of :issue_from, :issue_to, :relation_type

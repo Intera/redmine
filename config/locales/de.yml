@@ -1214,6 +1214,8 @@ de:
   label_new_project_issue_tab_enabled: Tab "Neues Ticket" anzeigen
   setting_new_item_menu_tab: Menü zum Anlegen neuer Objekte
   label_new_object_tab_enabled: Dropdown-Menü "+" anzeigen
+  label_tests: Test-Case von
+  label_tested: Test-Anforderung von
   label_table_of_contents: Inhaltsverzeichnis
   error_no_projects_with_tracker_allowed_for_new_issue: Es gibt keine Projekte mit Trackern, für welche sie Tickets erzeugen können
   field_textarea_font: Schriftart für Textbereiche
